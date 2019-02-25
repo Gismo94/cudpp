@@ -50,6 +50,18 @@ bool check_cuda_memory_64(size_t bytes_needed) {
     return check_cuda_memory<uint64_t>(bytes_needed);
 }
 
+void gpu_init() {
+    cudaSetDevice(0);
+    int dev=0;
+    cudaDeviceProp prop;
+    if (cudaGetDeviceProperties(&prop, dev) == cudaSuccess)
+    {
+        printf("Using device %d:\n", dev);
+        printf("%s; global mem: %dB; compute v%d.%d; clock: %d kHz\n",
+               prop.name, (int)prop.totalGlobalMem, (int)prop.major,
+               (int)prop.minor, (int)prop.clockRate);
+    }
+}
 
 void cuda_copy_device_to_device(unsigned int* d_in, unsigned int* d_out,
             size_t num_items) {

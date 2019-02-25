@@ -24,9 +24,9 @@
 #include <cuda_wrapper_interface.h>
 
 #include <string>
-#include <filesystem>
+//#include <filesystem>
 
-namespace fs = std::filesystem;
+//namespace fs = std::experimental::filesystem;
 
 // Returns size of the file. Creates a new unsigned char Pointer and fills it
 // with the text contained in the given file.
@@ -38,18 +38,10 @@ size_t get_file_content(std::string path_to_file, unsigned char* out_text) {
     return text_size;
 }
 
-int compute_sa(unsigned char* out_text, unsigned int* sa, size_t text_size) {
-    cudaSetDevice(0);
 
-    cudaDeviceProp prop;
-    if (cudaGetDeviceProperties(&prop, dev) == cudaSuccess)
-    {
-        printf("Using device %d:\n", dev);
-        printf("%s; global mem: %dB; compute v%d.%d; clock: %d kHz\n",
-               prop.name, (int)prop.totalGlobalMem, (int)prop.major,
-               (int)prop.minor, (int)prop.clockRate);
-    }
-    // Allocate cuda memory
+
+int compute_sa(unsigned char* out_text, unsigned int* sa, size_t text_size) {
+// Allocate cuda memory
     size_t free_bytes = check_cuda_memory_free();
     size_t mem_needed = text_size * sizeof(unsigned char);
     if(mem_needed > 0.015 * free_bytes) {
@@ -86,7 +78,7 @@ int compute_sa(unsigned char* out_text, unsigned int* sa, size_t text_size) {
         {
             std::cerr << "Error in plan creation" << std::endl;
         }
-        result = cudppSuffixArray(plan, d_idata, d_odata, test[k]);
+        result = cudppSuffixArray(plan, cuda_text, cuda_sa, text_size);
         if(result != CUDPP_SUCCESS) {
             std::cerr << "Error while computing suffix array." << std::endl;
         }
@@ -117,20 +109,19 @@ int compute_sa(unsigned char* out_text, unsigned int* sa, size_t text_size) {
     return 0;
 }
 
-void test_all_files(std::string path_to_files) {
+void test_all_files(vector<std::string> file_paths) {
     size_t text_size;
     unsigned char* out_text;
     unsigned int* sa;
-    for(const auto & file : fs:directory_iterator(path_to_files)) {
-        if(file.is_regular_file())
-        std::cout << "Computing sa for file " << file.path() << "." << std::endl;
+    for(std::string &file_path : file_paths) {
+        std::cout << "Computing sa for file " << file_path << "." << std::endl;
         // Fill with content
-        text_size = get_file_content(file.path(), out_text);
+        text_size = get_file_content(file_path, out_text);
         // Got the text, now test!
         sa = (unsigned int*) realloc(sa, text_size);
         auto error = compute_sa(out_text, sa, text_size);
         if(error != 0) {
-                std::cerr << "Error while computing sa for file " << file.path()
+                std::cerr << "Error while computing sa for file " << file_path
                 << "."<< std::endl;
         }
     }
@@ -142,9 +133,12 @@ void test_all_files(std::string path_to_files) {
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
 ////////////////////////////////////////////////////////////////////////////////
-int
-main( int argc, char** argv)
+int main(int argc, const char** argv)
 {
-    std::string path_to_files = "../../../apps/data/";
+    std::string parent_path = "../../../apps/data/";
+    auto file_paths = std::vector(5);
+    file_paths[0] = parent_path + "pc_sources.200MB";
+
     test_all_files(path_to_files);
+    return 0;
 }

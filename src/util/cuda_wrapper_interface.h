@@ -17,6 +17,8 @@ bool check_cuda_memory_64(size_t bytes_needed);
 
 size_t check_cuda_memory_free();
 
+void gpu_init();
+
 void cuda_copy_device_to_device(unsigned int* d_in, unsigned int* d_out,
             size_t num_items);
 /*

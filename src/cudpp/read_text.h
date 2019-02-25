@@ -15,7 +15,7 @@
      * This struct contains the size of the text and provides a function to read the text file into a string.
      */
 struct read_text_context {
-    mutable std::ifstream file;
+    mutable std::basic_ifstream<unsigned char> file;
     size_t size = 0;
 
     read_text_context() = default;
@@ -36,7 +36,7 @@ struct read_text_context {
         //DCHECK_LE(text_size.size(), this->size);
 
         file.seekg(0, std::ios::beg); // set the pointer to the beginning
-        file.read( (unsigned char*) out_text, text_size);
+        file.read( reinterpret_cast<unsigned char*>(out_text), text_size);
     }
     };
 
