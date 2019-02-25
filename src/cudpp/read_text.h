@@ -36,7 +36,7 @@ struct read_text_context {
         //DCHECK_LE(text_size.size(), this->size);
 
         file.seekg(0, std::ios::beg); // set the pointer to the beginning
-        file.read( (char*) out_text, text_size);
+        file.read( (unsigned char*) out_text, text_size);
     }
     };
 

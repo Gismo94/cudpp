@@ -123,6 +123,7 @@ if (CUDPP_BUILD_APPLICATIONS)
   add_subdirectory(apps/cudpp_testrig)
   add_subdirectory(apps/cudpp_hash_testrig)
   add_subdirectory(apps/simpleCUDPP)
+  add_subdirectory(apps/sa_tests)
   #add_subdirectory(apps/satGL)
 endif (CUDPP_BUILD_APPLICATIONS)
 
