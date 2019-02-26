@@ -118,6 +118,7 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 add_subdirectory(src/cudpp)
 add_subdirectory(src/cudpp_hash)
+add_subdirectory(src/util)
 
 if (CUDPP_BUILD_APPLICATIONS)
   add_subdirectory(apps/cudpp_testrig)
@@ -130,7 +131,7 @@ endif (CUDPP_BUILD_APPLICATIONS)
 # Make files that store configuration to help dependent CMake files use
 # these libraries.
 export(
-  TARGETS cudpp cudpp_hash
+  TARGETS cudpp cudpp_hash cudpp_util
   FILE ${LIBRARY_OUTPUT_PATH}/cudpp-targets.cmake
   )
 
