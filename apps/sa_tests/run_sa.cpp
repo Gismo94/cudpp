@@ -25,6 +25,8 @@
 #include "cudpp.h"
 #include "cuda_util.h"
 #include "read_text.h"
+#include "sa_gold.cpp"
+#include "comparearrays.h"
 #include <cuda_wrapper_interface.h>
 
 #include <string>
@@ -171,7 +173,9 @@ void test_all_files(std::vector<std::string> file_paths) {
     size_t text_size;
     unsigned char* out_text=NULL;
     unsigned int* sa = NULL;
+    unsigned int* reference = NULL;
     int error;
+    bool result;
     for(std::string &file_path : file_paths) {
         std::cout << "Computing sa for file " << file_path << "." << std::endl;
         // Fill with content
@@ -180,8 +184,6 @@ void test_all_files(std::vector<std::string> file_paths) {
         // Got the text, now test!
         std::cout << "(re)allocating pointer for sa." << std::endl;
         sa = (unsigned int*) malloc(text_size*sizeof(unsigned int));
-        sa[0] = 0;
-        std::cout << sa[0] << std::endl;
         std::cout << "Computing sa." << std::endl;
         error = compute_sa(out_text, sa, text_size);
         if(error != 0) {
@@ -189,12 +191,21 @@ void test_all_files(std::vector<std::string> file_paths) {
                 << "."<< std::endl;
         }
         /*
+        //std::cout << sa[0] << "," << sa[1] << "," << sa[2] << std::endl;
         // Compute reference sa
-        memset(reference, 0, sizeof(unsigned int) * (test[k]+3));
+        std::cout << "Computing reference SA." << std::endl;
+        reference = (unsigned int*) malloc(sizeof(unsigned int) * text_size);
+        memset(reference, 0, sizeof(unsigned int) * text_size);
 
-        computeSaGold(i_data, reference, test[k]);
-        */
+        computeSaGold(out_text, reference, text_size);
+
+        result = compareArrays<unsigned int> (reference, sa, text_size);
+        if(!result) {
+            std::cout << "SA not computed correctly." << std::endl;
+        }*/
+        std::cout << "Freeing host memory." << std::endl;
         free(out_text);
+        //free(reference);
         free(sa);
     }
 }
@@ -208,9 +219,10 @@ int main(int argc, const char** argv)
     gpu_init();
     std::cout << "Current path: " << GetCurrentWorkingDir() << std::endl;
     std::string parent_path = "../../apps/sa_tests/data/";
-    auto file_paths = std::vector<std::string>(1);
+    auto file_paths = std::vector<std::string>(3);
     file_paths[0] = parent_path + "pc_sources.2MB";
-
+    file_paths[1] = parent_path + "pc_sources.1MB";
+    file_paths[2] = parent_path + "pc_sources.50MB";
     test_all_files(file_paths);
     return 0;
 }

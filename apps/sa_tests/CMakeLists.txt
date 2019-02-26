@@ -11,6 +11,7 @@ find_package(CUDA REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/src/cudpp
     ${CMAKE_SOURCE_DIR}/src/util
+    ${CMAKE_SOURCE_DIR}/apps/cudpp_testrig
 )
 link_directories(${CMAKE_SOURCE_DIR}/../../lib/)
 
